@@ -22,9 +22,9 @@ public class CategoryService {
         categoryRepository.save(category);
     }
 
-    public Category findById(int id) {
-        Optional<Category> byId = categoryRepository.findById(id);
-        return byId.get();
+    public Optional<Category> findById(int id) {
+        return categoryRepository.findById(id);
+
     }
 
     public void deleteById(int id) {

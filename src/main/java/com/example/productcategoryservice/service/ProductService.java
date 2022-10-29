@@ -23,13 +23,12 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public Product findById(int id) {
-        Optional<Product> byId = productRepository.findById(id);
-        return byId.get();
+    public Optional<Product> findById(int id) {
+        return productRepository.findById(id);
     }
 
     public List<Product> findAllByCategoryId(int id) {
-       return productRepository.findAllByCategory_Id(id);
+        return productRepository.findAllByCategory_Id(id);
 
     }
 

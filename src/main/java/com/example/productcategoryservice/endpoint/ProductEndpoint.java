@@ -1,49 +1,62 @@
 package com.example.productcategoryservice.endpoint;
 
 import com.example.productcategoryservice.dto.CreateProductDto;
-import com.example.productcategoryservice.dto.DeleteProductDto;
 import com.example.productcategoryservice.dto.ProductResponseDto;
 import com.example.productcategoryservice.dto.UpdateProductDto;
+import com.example.productcategoryservice.entity.Product;
 import com.example.productcategoryservice.mapper.ProductMapper;
 import com.example.productcategoryservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/products")
 public class ProductEndpoint {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
 
-    @GetMapping("/products")
-    public List<ProductResponseDto> getAllProducts(){
-       return productMapper.map(productService.findAll());
+    @GetMapping()
+    public List<ProductResponseDto> getAllProducts() {
+        return productMapper.map(productService.findAll());
     }
-    @GetMapping("/products/{id}")
-    public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") int id){
-        ProductResponseDto map = productMapper.map(productService.findById(id));
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") int id) {
+        Optional<Product> byId = productService.findById(id);
+        if (byId.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        ProductResponseDto map = productMapper.map(byId.get());
         return ResponseEntity.ok(map);
     }
-    @PostMapping("/products")
-    public ResponseEntity<CreateProductDto> create(@RequestBody CreateProductDto createProductDto){
-        productService.save(productMapper.map(createProductDto));
-        return ResponseEntity.noContent().build();
+
+    @PostMapping()
+    public ResponseEntity<?> create(@RequestBody CreateProductDto createProductDto) {
+        Product map = productMapper.map(createProductDto);
+        productService.save(map);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.map(map));
     }
-    @GetMapping("/products/byCategory/{categoryId}")
-    public List<ProductResponseDto> getAllByCategory(@PathVariable("categoryId") int categoryId){
-            return productMapper.map(productService.findAllByCategoryId(categoryId));
+
+    @GetMapping("/byCategory/{categoryId}")
+    public List<ProductResponseDto> getAllByCategory(@PathVariable("categoryId") int categoryId) {
+        return productMapper.map(productService.findAllByCategoryId(categoryId));
     }
-    @PutMapping("/products")
-    public ResponseEntity<UpdateProductDto> update(@RequestBody UpdateProductDto updateProductDto){
+
+    @PutMapping()
+    public ResponseEntity<UpdateProductDto> update(@RequestBody UpdateProductDto updateProductDto) {
         productService.save(productMapper.map(updateProductDto));
         return ResponseEntity.ok(updateProductDto);
     }
-    @DeleteMapping("/products/{id}")
-    public ResponseEntity<DeleteProductDto> delete(@PathVariable("id") int id){
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") int id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
