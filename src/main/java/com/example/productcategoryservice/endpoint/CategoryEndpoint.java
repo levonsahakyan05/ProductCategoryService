@@ -36,7 +36,7 @@ public class CategoryEndpoint {
 
     }
 
-    @PostMapping()
+    @PostMapping("/add")
     public ResponseEntity<?> create(@RequestBody CreateCategoryDto createCategoryDto) {
         Category map = categoryMapper.map(createCategoryDto);
         categoryService.save(map);

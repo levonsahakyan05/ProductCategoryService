@@ -5,10 +5,12 @@ import com.example.productcategoryservice.dto.ProductResponseDto;
 import com.example.productcategoryservice.dto.UpdateProductDto;
 import com.example.productcategoryservice.entity.Product;
 import com.example.productcategoryservice.mapper.ProductMapper;
+import com.example.productcategoryservice.security.CurrentUser;
 import com.example.productcategoryservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class ProductEndpoint {
 
     private final ProductService productService;
     private final ProductMapper productMapper;
+
 
     @GetMapping()
     public List<ProductResponseDto> getAllProducts() {
@@ -37,7 +40,7 @@ public class ProductEndpoint {
         return ResponseEntity.ok(map);
     }
 
-    @PostMapping()
+    @PostMapping("/add")
     public ResponseEntity<?> create(@RequestBody CreateProductDto createProductDto) {
         Product map = productMapper.map(createProductDto);
         productService.save(map);
@@ -50,9 +53,13 @@ public class ProductEndpoint {
     }
 
     @PutMapping()
-    public ResponseEntity<UpdateProductDto> update(@RequestBody UpdateProductDto updateProductDto) {
-        productService.save(productMapper.map(updateProductDto));
-        return ResponseEntity.ok(updateProductDto);
+    public ResponseEntity<UpdateProductDto> update(@RequestBody UpdateProductDto updateProductDto,
+                                                   @AuthenticationPrincipal CurrentUser currentUser) {
+        if (updateProductDto.getUser().getId() == currentUser.getUser().getId()) {
+            productService.save(productMapper.map(updateProductDto));
+            return ResponseEntity.ok(updateProductDto);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
     @DeleteMapping("/{id}")
