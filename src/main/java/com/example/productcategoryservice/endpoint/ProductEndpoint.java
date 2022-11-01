@@ -63,9 +63,14 @@ public class ProductEndpoint {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") int id) {
-        productService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> delete(@PathVariable("id") int id,
+                                    @AuthenticationPrincipal CurrentUser currentUser) {
+        Optional<Product> byId = productService.findById(id);
+        if (byId.get().getUser().getId()== currentUser.getUser().getId()){
+            productService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+       return ResponseEntity.badRequest().build();
     }
 
 }
