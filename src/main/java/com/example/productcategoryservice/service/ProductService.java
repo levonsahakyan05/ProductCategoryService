@@ -20,6 +20,9 @@ public class ProductService {
     }
 
     public void save(Product product) {
+        if (product == null){
+            throw new RuntimeException("Product can't be null");
+        }
         productRepository.save(product);
     }
 
@@ -33,6 +36,9 @@ public class ProductService {
     }
 
     public void deleteById(int id) {
+        if (id == 0){
+            throw  new IllegalArgumentException("id can't be 0");
+        }
         productRepository.deleteById(id);
     }
 }

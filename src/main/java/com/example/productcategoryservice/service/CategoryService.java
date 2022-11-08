@@ -19,6 +19,9 @@ public class CategoryService {
     }
 
     public void save(Category category) {
+        if (category == null) {
+            throw new RuntimeException("Category can't be null");
+        }
         categoryRepository.save(category);
     }
 
@@ -28,6 +31,9 @@ public class CategoryService {
     }
 
     public void deleteById(int id) {
+        if (id == 0) {
+            throw new IllegalArgumentException("id can't be 0");
+        }
         categoryRepository.deleteById(id);
     }
 }
